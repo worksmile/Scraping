@@ -6,62 +6,110 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"> 
     <title>Document</title>
     <link rel="stylesheet" type="text/css" href="./css/index.css">
+    <style>
+        /* canvas{
+            border:1px solid transparent;
+        } */
+    </style>
 </head>
 <body>
-    <div class="wrapper">   
-        <ul>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/tan1.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/tan2.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/yee.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/yee1.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/yee2.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-            <li>
-                <div class="picBox">
-                    <div class="show">
-                        <img src="./img/yee3.jpg" alt="">
-                    </div>
-                    <div class="hide">麻团儿</div>
-                </div>
-            </li>
-        </ul> 
-    </div>
+    <canvas id="myCanvas" width=200 height=200></canvas>
+    <!-- <img id = "myimg" src = "./img/yee1.jpg"> -->
     <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="./js/index.js"></script>
+    <script>
+        var mycanvas = document.getElementById("myCanvas"),
+            ctx = mycanvas.getContext("2d"),
+            w = mycanvas.width,
+            h = mycanvas.height,
+            lastPoint = {},
+            nowPoint = {};
+        init();
+
+        function init(){
+            ctx.fillStyle = "#ccc";
+            ctx.fillRect(20,20,w,h);
+            ctx.globalCompositeOperation = 'destination-out';
+
+            var img = new Image();
+            
+            img.src = "./img/yee1.jpg";
+            img.onload = function(){
+                //mycanvas.style.background = 'url('+ img.src+')';
+                mycanvas.style.background = `url(${img.src})`;
+                mycanvas.addEventListener('mousedown',downFun,false);
+            }
+
+        }
+        //绑定鼠标按下和抬起事件
+        function downFun(e){
+            lastPoint.x = e.clientX - mycanvas.offsetLeft;
+            lastPoint.y = e.clientY - mycanvas.offsetTop;
+            mycanvas.addEventListener('mousemove',moveFun,false);
+            document.addEventListener('mouseup',upFun,false);
+        }
+        function moveFun(e){
+            nowPoint.x = e.clientX - mycanvas.offsetLeft;
+            nowPoint.y = e.clientY - mycanvas.offsetTop;
+
+            ctx.beginPath();
+            ctx.fillStyle = 'red';
+
+            //保持连贯
+            ctx.moveTo(lastPoint.x,lastPoint.y);
+            ctx.lineTo(nowPoint.x,nowPoint.y);
+            ctx.lineWidth = 40;
+            ctx.lineType = "round";
+            ctx.stroke();
+
+            ctx.arc(nowPoint.x,nowPoint.y,20,0,Math.PI*2,0);
+            ctx.closePath();
+            ctx.fill();
+
+            lastPoint.x = nowPoint.x;
+            lastPoint.y = nowPoint.y;
+        }
+
+        function upFun(){
+            mycanvas.removeEventListener('mousemove',moveFun,false);
+            document.removeEventListener('mouseup',upFun,false);
+            clearCanvas();
+        }
+
+        function clearCanvas(){
+            var d = ctx.getImageData(0,0,w,h),
+                c = 0,
+                len = d.data.length;
+            //console.log(len);
+            for(var i = 0;i<len;i+=4){
+                if(d.data[i]===0){
+                    c++;
+                }
+            }
+            //console.log(c);
+            if(c>len/4*0.7){
+                ctx.clearRect(0,0,w,h);
+            }
+        }
+
+
+        // var myimg = document.getElementById("myimg");
+        // ctx.drawImage(myimg,100,100);
+
+        // ctx.shadowColor="green";
+        // ctx.shadowOffsetX = 20;
+        // ctx.shadowOffsetY = 20;
+        // ctx.shadowBlur =10;
+        // ctx.fillStyle = "red";
+        // ctx.fillRect(0,0,100,100);
+
+        // ctx.font = "20px sans-serif";
+        // ctx.textAlign = "center";
+        // ctx.textBaseline = "middle";
+        // ctx.strokeText('hello',100,100);
+        
+
+    </script>
 </body>
 </html>
 
